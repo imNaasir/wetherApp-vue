@@ -1,27 +1,19 @@
 <template>
-
-
-  <div id="app" >
+  <div id="app">
     <main>
       <div class="search-box">
-        <input 
-          type="text" 
-          class="search-bar" 
-          placeholder="Search..."
-          v-model="query"
-          @keypress="fetchWeather"
-        />
+        <input type="text" class="search-bar" placeholder="Search..." v-model="query" @keypress="fetchWeather" />
       </div>
 
-      <div class="weather-wrap" >
+      <div class="weather-wrap">
         <div class="location-box">
-          <div class="location">{{cities}},  {{ country }}</div>
-          <div class="date">{{date_time}}</div>
+          <div class="location">{{ cities }}, {{ country }}</div>
+          <div class="date">{{ date_time }}</div>
         </div>
 
         <div class="weather-box">
           <div class="temp">{{ temperature }}C</div>
-          <div class="weather">{{weather_text}}</div>
+          <div class="weather">{{ weather_text }}</div>
         </div>
       </div>
     </main>
@@ -35,14 +27,14 @@ export default {
   components: {
     HelloWorld
   },
-  data () {
+  data() {
     return {
       api_key: 'xxIX9PSzKBh5II5QAJATVEboIh7wjoFJ',
       url_base: 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete',
       condition_url: 'http://dataservice.accuweather.com/currentconditions/v1/',
       query: '',
       weather: {},
-      cities:'city',
+      cities: 'city',
       country: 'country',
       temperature: '',
       key: '301348',
@@ -53,7 +45,7 @@ export default {
     }
   },
   methods: {
-    fetchWeather (e) {
+    fetchWeather(e) {
       if (e.key == "Enter") {
         fetch(`${this.url_base}?apikey=${this.api_key}&q=${this.query.trim().toLocaleLowerCase()}`)
           .then(res => {
@@ -69,11 +61,11 @@ export default {
             return data;
           }).then(this.setTemp);
 
-          this.query = ''
+        this.query = ''
       }
-      
+
     },
-    setResults (results) {
+    setResults(results) {
       this.weather = results;
       // console.log(this.weather);
       this.weather.forEach(cities => {
@@ -81,9 +73,8 @@ export default {
         this.country = cities.Country.LocalizedName
         this.key = cities.Key
         console.log(this.key);
-
         // localStorage.setItem
-        localStorage.setItem("city", this.cities)
+        localStorage.setItem("data", JSON.stringify({ city: cities.LocalizedName, country: cities.Country.LocalizedName, key: cities.Key }))
       });
     },
     setTemp(results) {
@@ -94,17 +85,30 @@ export default {
         this.weather_text = temperature.WeatherText
         this.date_time = temperature.LocalObservationDateTime
         console.log(this.date_time);
+
+        localStorage.setItem("seconData", JSON.stringify({ temperature: temperature.Temperature.Metric.Value, wetherText: temperature.WeatherText, date_time: temperature.LocalObservationDateTime }))
       });
     },
-    
+
 
   },
-  mounted () {
-    if(localStorage.getItem("city").length > 0){
-      this.cities = localStorage.getItem("city")
+  mounted() {
+    if (localStorage.getItem("data")?.length > 0) {
+      let data = JSON.parse(localStorage.getItem("data"))
+      // console.log(JSON.parse(data));
+      this.cities =  data.city
+      this.country =  data.country
+      this.key = data.key
+      
     };
+    if (localStorage.getItem("seconData")?.length > 0) {
+      let data = JSON.parse(localStorage.getItem("seconData"))
+        this.temperature = data.temperature
+        this.weather_text = data.wetherText
+        this.date_time = data.date_time
+    }
   },
-  
+
 }
 </script>
 
@@ -114,9 +118,11 @@ export default {
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: 'montserrat', sans-serif;
 }
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -126,6 +132,7 @@ body {
   background-position: bottom;
   transition: 0.4s;
 }
+
 /* #app.warm {
   background-image: url('./assets/warm-bg.jpg');
 } */
@@ -137,19 +144,21 @@ main {
   background-size: 100% 100%;
   background-repeat: no-repeat;
 }
+
 .search-box {
   width: 100%;
   margin-bottom: 30px;
 }
+
 .search-box .search-bar {
   display: block;
   width: 100%;
   padding: 15px;
-  
+
   color: #313131;
   font-size: 20px;
   appearance: none;
-  border:none;
+  border: none;
   outline: none;
   background: none;
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
@@ -157,11 +166,13 @@ main {
   border-radius: 0px 16px 0px 16px;
   transition: 0.4s;
 }
+
 .search-box .search-bar:focus {
   box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.25);
   background-color: rgba(255, 255, 255, 0.75);
   border-radius: 16px 0px 16px 0px;
 }
+
 .location-box .location {
   color: #FFF;
   font-size: 32px;
@@ -169,6 +180,7 @@ main {
   text-align: center;
   text-shadow: 1px 3px rgba(0, 0, 0, 0.25);
 }
+
 .location-box .date {
   color: #FFF;
   font-size: 20px;
@@ -178,9 +190,11 @@ main {
   color: #2c3e50;
   margin-top: 60px;
 }
+
 .weather-box {
   text-align: center;
 }
+
 .weather-box .temp {
   display: inline-block;
   padding: 10px 25px;
@@ -188,11 +202,12 @@ main {
   font-size: 102px;
   font-weight: 900;
   text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-  background-color:rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.25);
   border-radius: 16px;
   margin: 30px 0px;
   box-shadow: 3px 6px rgba(0, 0, 0, 0.25);
 }
+
 .weather-box .weather {
   color: #FFF;
   font-size: 48px;
