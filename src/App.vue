@@ -29,7 +29,7 @@ export default {
   },
   data() {
     return {
-      api_key: 'xxIX9PSzKBh5II5QAJATVEboIh7wjoFJ',
+      api_key: 'Ae3QvAxWsi6t5SJ5ocNsNDcZYAOwdMAK',
       url_base: 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete',
       condition_url: 'http://dataservice.accuweather.com/currentconditions/v1/',
       query: '',
