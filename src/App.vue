@@ -8,20 +8,20 @@
           type="text" 
           class="search-bar" 
           placeholder="Search..."
-          v-model="city"
+          v-model="query"
           @keypress="fetchWeather"
         />
       </div>
 
       <div class="weather-wrap" >
         <div class="location-box">
-          <div class="location">{{ city }} and country</div>
-          <div class="date">date builder</div>
+          <div class="location">{{cities}},  {{ country }}</div>
+          <div class="date">{{date_time}}</div>
         </div>
 
         <div class="weather-box">
-          <div class="temp">7C</div>
-          <div class="weather">rain</div>
+          <div class="temp">{{ temperature }}C</div>
+          <div class="weather">{{weather_text}}</div>
         </div>
       </div>
     </main>
@@ -37,26 +37,74 @@ export default {
   },
   data () {
     return {
-      city: '',
-      url: 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete',
-      apikey: 'zGaJZNxYJYKWBD2HPsIsrEYTbjA7pvzI',
+      api_key: 'xxIX9PSzKBh5II5QAJATVEboIh7wjoFJ',
+      url_base: 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete',
+      condition_url: 'http://dataservice.accuweather.com/currentconditions/v1/',
       query: '',
-      weather: {}
+      weather: {},
+      cities:'city',
+      country: 'country',
+      temperature: '',
+      key: '301348',
+      temp_Resul: '',
+      weather_text: '',
+      date_time: '',
+
     }
   },
   methods: {
     fetchWeather (e) {
       if (e.key == "Enter") {
-        fetch(`?`)
+        fetch(`${this.url_base}?apikey=${this.api_key}&q=${this.query.trim().toLocaleLowerCase()}`)
           .then(res => {
-            console.log(res);
-            return res.json();
+            const data = res.json();
+            // console.log(data);
+            return data;
           }).then(this.setResults);
+
+        fetch(`http://dataservice.accuweather.com/currentconditions/v1/${this.key}/?apikey=${this.api_key}`)
+          .then(res => {
+            const data = res.json();
+            // console.log(data);
+            return data;
+          }).then(this.setTemp);
+
+          this.query = ''
       }
+      
     },
+    setResults (results) {
+      this.weather = results;
+      // console.log(this.weather);
+      this.weather.forEach(cities => {
+        this.cities = cities.LocalizedName
+        this.country = cities.Country.LocalizedName
+        this.key = cities.Key
+        console.log(this.key);
 
+        // localStorage.setItem
+        localStorage.setItem("city", this.cities)
+      });
+    },
+    setTemp(results) {
+      this.temp_Resul = results;
+      console.log(this.temp_Resul); //Temperature
+      this.temp_Resul.forEach(temperature => {
+        this.temperature = temperature.Temperature.Metric.Value
+        this.weather_text = temperature.WeatherText
+        this.date_time = temperature.LocalObservationDateTime
+        console.log(this.date_time);
+      });
+    },
+    
 
-  }
+  },
+  mounted () {
+    if(localStorage.getItem("city").length > 0){
+      this.cities = localStorage.getItem("city")
+    };
+  },
+  
 }
 </script>
 
