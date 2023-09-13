@@ -91,28 +91,33 @@ export default {
       // this.weather.forEach(cities => {
       this.cities = this.weather.name
       this.country = this.weather.sys.country
-      this.temperature = this.weather.main.temp
+      this.temperature = Math.round(this.weather.main.temp)
       this.weather_text = this.weather.weather[0].description
       this.humidity = this.weather.main.humidity
       this.speed = this.weather.wind.speed
+      // let now = new Date(this.weather.dt*1000-(this.weather.timezone*1000));
+      // let options = {
+      //   day: 'numeric',
+      //   month: 'numeric',
+      //   year: "numeric",
+      //   wekday: 'long'
+      // }
+      // let formatedUK = Intl.DateTimeFormat('en-Uk', options).format(now);
+      // console.log(formatedUK);
+      const localTime = new Date().getTime()
+      const localOffset = new Date().getTimezoneOffset() * 60000
+      const currentUtcTime = localOffset + localTime
+      const cityOffset = currentUtcTime + 1000 * thi.weather.timezone
+      const cityTime = new Date(cityOffset).toTimeString().split(' ')
+      this.date_time = cityTime;
+      alert("city time =>" + cityTime)
+
       // this.key = cities.Key
       // console.log(this.key);
       // localStorage.setItem
-      localStorage.setItem("data", JSON.stringify({ city: this.weather.name, country: this.weather.sys.country, temp: this.weather.main.temp, weather: this.weather.weather[0].description, humidity: this.weather.main.humidity, speed: this.weather.wind.speed }))
+      localStorage.setItem("data", JSON.stringify({ city: this.weather.name, country: this.weather.sys.country, temp: Math.round(this.weather.main.temp), weather: this.weather.weather[0].description, humidity: this.weather.main.humidity, speed: this.weather.wind.speed }))
       // });
     },
-    // setTemp(results) {
-    //   this.temp_Resul = results;
-    //   console.log(this.temp_Resul); //Temperature
-    //   this.temp_Resul.forEach(temperature => {
-    //     this.temperature = temperature.Temperature.Metric.Value
-    //     this.weather_text = temperature.WeatherText
-    //     this.date_time = temperature.LocalObservationDateTime
-    //     console.log(this.date_time);
-
-    //     localStorage.setItem("seconData", JSON.stringify({ temperature: temperature.Temperature.Metric.Value, wetherText: temperature.WeatherText, date_time: temperature.LocalObservationDateTime }))
-    //   });
-    // },
 
 
   },
@@ -164,6 +169,8 @@ body {
   background-image: url('./assets/warm-bg.jpg');
 } */
 main {
+  width: 100vw;
+  overflow: hidden;
   min-height: 100vh;
   padding: 25px;
   background-image: url('https://img.freepik.com/premium-photo/background_889056-16814.jpg');
@@ -226,13 +233,19 @@ main {
   display: inline-block;
   padding: 10px 25px;
   color: #FFF;
-  font-size: 102px;
+  font-size: 70px;
   font-weight: 900;
   text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
   background-color: rgba(255, 255, 255, 0.25);
   border-radius: 16px;
   margin: 30px 0px;
   box-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+@media only screen and (min-width: 768px) {
+  .weather-box .temp {
+    font-size: 102px;
+  }
 }
 
 .weather-box .weather {
