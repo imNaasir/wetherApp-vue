@@ -12,8 +12,25 @@
         </div>
 
         <div class="weather-box">
-          <div class="temp">{{ temperature }}C</div>
+          <div class="temp">{{ temperature }}°C</div>
           <div class="weather">{{ weather_text }}</div>
+          <div class="detail">
+            <div style="display: flex; column-gap: 8px; align-items: center;">
+              <img src="./assets/images/humidity.png" alt="" style="width: 50px; height: 40px; opacity: 0.5;">
+              <div>
+                <div class="details">{{ humidity }}%</div>
+                <small class="details" style="font-size: 15px; ">Humidity</small>
+              </div>
+            </div>
+            <div style="display: flex; column-gap: 8px; align-items: center; ">
+              <img src="./assets/images/wind.png" alt="" style="width: 50px; height: 40px; opacity: 0.5;">
+              <div style="display: flex;  flex-direction: column; ">
+                <div class="details">{{ speed }}km/h</div>
+                <small class="details" style="font-size: 15px; text-align: start; ">Wind Speed</small>
+              </div>
+            </div>
+            <!-- <div class="details">{{ speed }}km/h</div> -->
+          </div>
         </div>
       </div>
     </main>
@@ -29,8 +46,9 @@ export default {
   },
   data() {
     return {
-      api_key: 'Ae3QvAxWsi6t5SJ5ocNsNDcZYAOwdMAK',
-      url_base: 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete',
+      api_key: '494a1b4f5973f35f71dcf349e65bd406',
+      // url_base: 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete',
+      url_base: 'https://api.openweathermap.org/data/2.5/weather?units=metric&q=',
       condition_url: 'http://dataservice.accuweather.com/currentconditions/v1/',
       query: '',
       weather: {},
@@ -41,16 +59,18 @@ export default {
       temp_Resul: '',
       weather_text: '',
       date_time: '',
+      humidity: '',
+      speed: '',
 
     }
   },
   methods: {
     fetchWeather(e) {
       if (e.key == "Enter") {
-        fetch(`${this.url_base}?apikey=${this.api_key}&q=${this.query.trim().toLocaleLowerCase()}`)
+        fetch(`${this.url_base}${this.query.trim().toLocaleLowerCase()}&appid=${this.api_key}`)
           .then(res => {
             const data = res.json();
-            // console.log(data);
+            console.log("the data:==", data);
             return data;
           }).then(this.setResults);
 
@@ -67,28 +87,32 @@ export default {
     },
     setResults(results) {
       this.weather = results;
-      // console.log(this.weather);
-      this.weather.forEach(cities => {
-        this.cities = cities.LocalizedName
-        this.country = cities.Country.LocalizedName
-        this.key = cities.Key
-        console.log(this.key);
-        // localStorage.setItem
-        localStorage.setItem("data", JSON.stringify({ city: cities.LocalizedName, country: cities.Country.LocalizedName, key: cities.Key }))
-      });
+      console.log("the weather:==", this.weather);
+      // this.weather.forEach(cities => {
+      this.cities = this.weather.name
+      this.country = this.weather.sys.country
+      this.temperature = this.weather.main.temp
+      this.weather_text = this.weather.weather[0].description
+      this.humidity = this.weather.main.humidity
+      this.speed = this.weather.wind.speed
+      // this.key = cities.Key
+      // console.log(this.key);
+      // localStorage.setItem
+      localStorage.setItem("data", JSON.stringify({ city: this.weather.name, country: this.weather.sys.country, temp: this.weather.main.temp, weather: this.weather.weather[0].description, humidity: this.weather.main.humidity, speed: this.weather.wind.speed }))
+      // });
     },
-    setTemp(results) {
-      this.temp_Resul = results;
-      console.log(this.temp_Resul); //Temperature
-      this.temp_Resul.forEach(temperature => {
-        this.temperature = temperature.Temperature.Metric.Value
-        this.weather_text = temperature.WeatherText
-        this.date_time = temperature.LocalObservationDateTime
-        console.log(this.date_time);
+    // setTemp(results) {
+    //   this.temp_Resul = results;
+    //   console.log(this.temp_Resul); //Temperature
+    //   this.temp_Resul.forEach(temperature => {
+    //     this.temperature = temperature.Temperature.Metric.Value
+    //     this.weather_text = temperature.WeatherText
+    //     this.date_time = temperature.LocalObservationDateTime
+    //     console.log(this.date_time);
 
-        localStorage.setItem("seconData", JSON.stringify({ temperature: temperature.Temperature.Metric.Value, wetherText: temperature.WeatherText, date_time: temperature.LocalObservationDateTime }))
-      });
-    },
+    //     localStorage.setItem("seconData", JSON.stringify({ temperature: temperature.Temperature.Metric.Value, wetherText: temperature.WeatherText, date_time: temperature.LocalObservationDateTime }))
+    //   });
+    // },
 
 
   },
@@ -96,17 +120,20 @@ export default {
     if (localStorage.getItem("data")?.length > 0) {
       let data = JSON.parse(localStorage.getItem("data"))
       // console.log(JSON.parse(data));
-      this.cities =  data.city
-      this.country =  data.country
-      this.key = data.key
-      
+      this.cities = data.city
+      this.country = data.country
+      this.temperature = data.temp
+      this.weather_text = data.weather
+      this.humidity = data.humidity
+      this.speed = data.speed
+
     };
-    if (localStorage.getItem("seconData")?.length > 0) {
-      let data = JSON.parse(localStorage.getItem("seconData"))
-        this.temperature = data.temperature
-        this.weather_text = data.wetherText
-        this.date_time = data.date_time
-    }
+    // if (localStorage.getItem("seconData")?.length > 0) {
+    //   let data = JSON.parse(localStorage.getItem("seconData"))
+    //     this.temperature = data.temperature
+    //     this.weather_text = data.wetherText
+    //     this.date_time = data.date_time
+    // }
   },
 
 }
@@ -215,4 +242,24 @@ main {
   font-style: italic;
   text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
 }
+
+.detail {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 80px 40px;
+}
+
+.detail .details {
+  color: #FFF;
+  opacity: 0.8;
+  font-size: 28px;
+  font-weight: 700;
+  font-style: italic;
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
 </style>
+
+
+//fetch(`?apikey=&q=`)
