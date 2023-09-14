@@ -7,7 +7,7 @@
 
       <div class="weather-wrap">
         <div class="location-box">
-          <div class="location">{{ cities }}, {{ country }}</div>
+          <div class="location">{{ cities }}</div>
           <div class="date">{{ date_time }}</div>
         </div>
 
@@ -95,27 +95,14 @@ export default {
       this.weather_text = this.weather.weather[0].description
       this.humidity = this.weather.main.humidity
       this.speed = this.weather.wind.speed
-      // let now = new Date(this.weather.dt*1000-(this.weather.timezone*1000));
-      // let options = {
-      //   day: 'numeric',
-      //   month: 'numeric',
-      //   year: "numeric",
-      //   wekday: 'long'
-      // }
-      // let formatedUK = Intl.DateTimeFormat('en-Uk', options).format(now);
-      // console.log(formatedUK);
-      const localTime = new Date().getTime()
-      const localOffset = new Date().getTimezoneOffset() * 60000
-      const currentUtcTime = localOffset + localTime
-      const cityOffset = currentUtcTime + 1000 * thi.weather.timezone
-      const cityTime = new Date(cityOffset).toTimeString().split(' ')
-      this.date_time = cityTime;
-      alert("city time =>" + cityTime)
+      let now = new Date(this.weather.dt * 1000 - (this.weather.timezone * 1000));
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const dateNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      let currentTime = ` ${dateNames[now.getDay() - 1]},  ${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} `
+      console.log(currentTime)
+      this.date_time = currentTime
 
-      // this.key = cities.Key
-      // console.log(this.key);
-      // localStorage.setItem
-      localStorage.setItem("data", JSON.stringify({ city: this.weather.name, country: this.weather.sys.country, temp: Math.round(this.weather.main.temp), weather: this.weather.weather[0].description, humidity: this.weather.main.humidity, speed: this.weather.wind.speed }))
+      localStorage.setItem("data", JSON.stringify({ city: this.weather.name, country: this.weather.sys.country, temp: Math.round(this.weather.main.temp), weather: this.weather.weather[0].description, humidity: this.weather.main.humidity, speed: this.weather.wind.speed, dateTime: currentTime }))
       // });
     },
 
@@ -131,14 +118,9 @@ export default {
       this.weather_text = data.weather
       this.humidity = data.humidity
       this.speed = data.speed
+      this.date_time = data.dateTime
 
     };
-    // if (localStorage.getItem("seconData")?.length > 0) {
-    //   let data = JSON.parse(localStorage.getItem("seconData"))
-    //     this.temperature = data.temperature
-    //     this.weather_text = data.wetherText
-    //     this.date_time = data.date_time
-    // }
   },
 
 }
@@ -209,21 +191,22 @@ main {
 
 .location-box .location {
   color: #FFF;
+  font-size: 48px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.location-box .date {
+  margin-top: 60px;
+  color: #FFF;
+  font-style: italic;
   font-size: 32px;
   font-weight: 500;
   text-align: center;
   text-shadow: 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-.location-box .date {
-  color: #FFF;
-  font-size: 20px;
-  font-weight: 300;
-  font-style: italic;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 
 .weather-box {
   text-align: center;
@@ -250,10 +233,11 @@ main {
 
 .weather-box .weather {
   color: #FFF;
-  font-size: 48px;
-  font-weight: 700;
   font-style: italic;
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+  font-size: 32px;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .detail {
